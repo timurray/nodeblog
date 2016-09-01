@@ -7,7 +7,6 @@ server.use(bodyParser.urlencoded({ extended: true }));
 
 //all new routes go after this line
 //ex: var main = require('./main');
-
 var main = require('./main');
 
 //ex: server.use('./main', main);
