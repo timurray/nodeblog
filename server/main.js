@@ -26,12 +26,21 @@ router.post('/userpage', function(req, res) {
 				else{
 					console.log("we here");
 					found_user = true;	
-					res.send("yo u signed in my bro");	
+					res.send("yo u signed in my bro");
+					//if found need to redirect to user's blog page	
 					return;
 				}
 		});
 	});
 });
+
+router.get('/myblog', function(req, res) {
+	
+});
+
+/*router.get('/blog/:userName', function(req, res) {
+	//THIS WILL BRING UP THE BLOG FOR THAT USER, TO VIEW IT NOT EDIT IT
+});*/
 
 router.get('/register', function(req, res) {
 	res.sendFile('pages/register.html', {root: __dirname });
