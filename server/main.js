@@ -41,24 +41,23 @@ router.post('/registered', function(req, res) {
 	var email = req.body.email;
 	var password = req.body.password;
 	var username = req.body.username;
-	//var exists = true;
 	
-	console.log(email);
-	console.log(username);
-	
-	db.serialize(function() {
-		db.get("SELECT u.* FROM users u WHERE u.username = '" + username + "'", function(err, row){
-			if(row == undefined || row === []) {
-				console.log("none found");
-				db.run("INSERT INTO users (email, password, username) VALUES ('" + email + "','" + password + "','" + username + "')");
-				res.send("User registered with the following info: " + "<br>" + email + "<br>" + username + "<br>" + "<a href='/'>Back to log in screen</a>");
-			}
-			else{
-				console.log(row.username);
-				res.send('That username or email has already been registered' + '<br>' + '<a href="/register">Back to Register screen</a>');
-			}
+	if(email === '' || password === '' || username === ''){
+		res.send('One or more fields were left blank' + '<br>' + '<a href="/register">Back to Register screen</a>');
+	}
+	else{
+		db.serialize(function() {
+			db.get("SELECT u.* FROM users u WHERE u.username = '" + username + "'", function(err, row){
+				if(row == undefined || row === []) {
+					db.run("INSERT INTO users (email, password, username) VALUES ('" + email + "','" + password + "','" + username + "')");
+					res.send("User registered with the following info: " + "<br>" + email + "<br>" + username + "<br>" + "<a href='/'>Back to log in screen</a>");
+				}
+				else{
+					res.send('That username or email has already been registered' + '<br>' + '<a href="/register">Back to Register screen</a>');
+				}
+			});
 		});
-	});
+	}
 });
 
 
