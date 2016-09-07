@@ -1,46 +1,79 @@
 var express = require('express');
+var crypto = require('crypto');
 var bodyParser = require('body-parser');
 var sqlite = require('sqlite3').verbose();
 var router = express.Router();
+//var cookieParser = require('cookie-parser');
 
 var db = new sqlite.Database("blog.db");
 
-router.get('/', function(req, res) {
+router.get('/', function(req, res) {	
 	res.sendFile('pages/index.html', {root: __dirname });
 });
 
-router.post('/userpage', function(req, res) {
+router.post('/login', function(req, res) {
 	var email = req.body.email;
 	var password = req.body.password;
-	var found_user = false;
 	
 	db.serialize(function() {
-		db.each("SELECT u.* FROM users u WHERE u.email = '" + email + "' AND u.password = '" + password + "'", function(err, row) {
+		db.get("SELECT u.* FROM users u WHERE u.email = '" + email + "' AND u.password = '" + password + "'", function(err, row) {
 				console.log(email);
 				console.log(password);
 				console.log(err);
 				if(err || row == undefined || row === []){
 					console.log("Invalid credentials");
-					res.write('<h1>Invalid Credientials</h1>\n<a href="/">Back to log in screen</a>');
+					res.send('<h1>Invalid Credientials</h1>\n<a href="/">Back to log in screen</a>');
 				}
 				else{
-					console.log("we here");
-					found_user = true;	
-					res.send("yo u signed in my bro");
-					//if found need to redirect to user's blog page	
+					console.log("we here");	
+					token = crypto.randomBytes(128).toString('hex');
+					res.cookie('uuid', token, {expires: new Date(Date.now() + 9999999)});
+					
+					//adds session to database
+					db.run("INSERT OR REPLACE INTO sessionTokens (uid, token) VALUES ((SELECT username FROM users WHERE email ='"+ email + "'), '" + token + "')");
+					
+					var uname = row.username;
+					console.log(uname);
+					
+					//redirects to user's blog page
+					res.redirect('/blog/' + uname);
+					
 					return;
 				}
 		});
 	});
 });
 
-router.get('/myblog', function(req, res) {
-	
+router.get('/logout/:userName', function(req, res) {
+	var username = req.params.userName;
+	console.log(username);
+	db.serialize(function(err) {
+		db.run("DELETE FROM sessionTokens WHERE uid= '" + username + "'");
+	});
+	res.clearCookie('uuid');
+	console.log('logout success');
+	res.redirect('/');
 });
 
-/*router.get('/blog/:userName', function(req, res) {
-	//THIS WILL BRING UP THE BLOG FOR THAT USER, TO VIEW IT NOT EDIT IT
-});*/
+router.get('/blog/:userName', function(req, res) {
+	var username = req.params.userName;
+	if(req.cookies.uuid) {
+		db.serialize(function() {
+			db.get("SELECT uid FROM sessionTokens WHERE token='" + req.cookies.uuid + "'", function(err, row) {
+				if(row.uid == username){
+					console.log(req.cookies.uuid);
+					res.send('<h1>you are logged in, here is your blog</h1>\n<a href="/logout/' + username + '">Logout</a>');
+				}
+				else {
+					res.send('you can view but not edit');
+				}
+			});
+		});
+	}
+	else{
+		res.redirect('/');
+	}	
+});
 
 router.get('/register', function(req, res) {
 	res.sendFile('pages/register.html', {root: __dirname });

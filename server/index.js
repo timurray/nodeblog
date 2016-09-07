@@ -1,9 +1,13 @@
 var express = require('express');
+var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var session = require("express-session");
 
 var server = express();
 server.use(express.static(__dirname + '/public'));
 server.use(bodyParser.urlencoded({ extended: true }));
+server.use(cookieParser());
+//server.use(session({ resave: true, saveUninitialzed: true, secret: "awdijnawido"}));
 
 //all new routes go after this line
 //ex: var main = require('./main');
