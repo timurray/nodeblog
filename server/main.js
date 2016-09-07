@@ -36,7 +36,7 @@ router.post('/login', function(req, res) {
 					console.log(uname);
 					
 					//redirects to user's blog page
-					res.redirect('/blog/' + uname);
+					res.redirect('/' + uname);
 					
 					return;
 				}
@@ -55,7 +55,7 @@ router.get('/logout/:userName', function(req, res) {
 	res.redirect('/');
 });
 
-router.get('/blog/:userName', function(req, res) {
+router.get('/:userName', function(req, res) {
 	var username = req.params.userName;
 	if(req.cookies.uuid) {
 		db.serialize(function() {
