@@ -63,15 +63,17 @@ router.get('/:userName', function(req, res) {
 				if(row.uid == username){
 					console.log(req.cookies.uuid);
 					res.send('<h1>you are logged in, here is your blog</h1>\n<a href="/logout/' + username + '">Logout</a>');
+					// LOAD EDIT BLOG HTML PAGE USING JADE/PUG????
 				}
 				else {
 					res.send('you can view but not edit');
+					// LOAD VIEW BLOG HTML PAGE
 				}
 			});
 		});
 	}
 	else{
-		res.redirect('/');
+		res.send('you can view but not edit, no session token version');
 	}	
 });
 
