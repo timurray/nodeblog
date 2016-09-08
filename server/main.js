@@ -8,7 +8,16 @@ var router = express.Router();
 var db = new sqlite.Database("blog.db");
 
 router.get('/', function(req, res) {	
-	res.sendFile('pages/index.html', {root: __dirname });
+	if(req.cookies.uuid) {
+		db.serialize(function() {
+			db.get("SELECT uid FROM sessionTokens WHERE token='" + req.cookies.uuid + "'", function(err, row) {
+				res.redirect('/' + row.uid);
+			});
+		});
+	}
+	else {
+		res.sendFile('pages/index.html', {root: __dirname });
+	}
 });
 
 router.post('/login', function(req, res) {
@@ -20,7 +29,7 @@ router.post('/login', function(req, res) {
 				console.log(email);
 				console.log(password);
 				console.log(err);
-				if(err || row == undefined || row === []){
+				if(err || row === undefined || row === []){
 					console.log("Invalid credentials");
 					res.send('<h1>Invalid Credientials</h1>\n<a href="/">Back to log in screen</a>');
 				}
@@ -57,24 +66,45 @@ router.get('/logout/:userName', function(req, res) {
 
 router.get('/:userName', function(req, res) {
 	var username = req.params.userName;
-	if(req.cookies.uuid) {
-		db.serialize(function() {
-			db.get("SELECT uid FROM sessionTokens WHERE token='" + req.cookies.uuid + "'", function(err, row) {
-				if(row.uid == username){
-					console.log(req.cookies.uuid);
-					res.send('<h1>you are logged in, here is your blog</h1>\n<a href="/logout/' + username + '">Logout</a>');
-					// LOAD EDIT BLOG HTML PAGE USING JADE/PUG????
-				}
-				else {
-					res.send('you can view but not edit');
-					// LOAD VIEW BLOG HTML PAGE
-				}
-			});
+	var userExists = false;
+
+	db.serialize(function() {
+		db.each("SELECT * FROM users WHERE username='" + username + "'", function(err, row) {
+			if(err){
+				console.log(err);
+			}
+			if(row !== undefined || row !== []){
+				userExists = true;
+			}
+			
+		}, function() {
+			console.log(req.cookies.uuid);
+		   	if(req.cookies.uuid) {
+				//need to index the sessions and compare those instead of the entire string
+				db.each("SELECT uid FROM sessionTokens WHERE token='" + req.cookies.uuid + "'", function(err, row) {
+					console.log(row);
+					if(row.uid === username){
+						console.log(req.cookies.uuid);
+						res.send('<h1>you are logged in, here is your blog</h1>\n<a href="/logout/' + username + '">Logout</a>');
+						// LOAD EDIT BLOG HTML PAGE USING JADE/PUG????
+					}
+					else if(!userExists){
+						res.send("this blog does not exist");
+					}
+					else {
+						res.send('you can view but not edit');
+						// LOAD VIEW BLOG HTML PAGE
+					}
+				});
+			}
+			else if(!userExists){
+				res.send("this blog does not exist no session");
+			}
+			else{
+				res.send('you can view but not edit, no session token version');
+			}
 		});
-	}
-	else{
-		res.send('you can view but not edit, no session token version');
-	}	
+	});
 });
 
 router.get('/register', function(req, res) {
@@ -92,7 +122,7 @@ router.post('/registered', function(req, res) {
 	else{
 		db.serialize(function() {
 			db.get("SELECT u.* FROM users u WHERE u.username = '" + username + "'", function(err, row){
-				if(row == undefined || row === []) {
+				if(row === undefined || row === []) {
 					db.run("INSERT INTO users (email, password, username) VALUES ('" + email + "','" + password + "','" + username + "')");
 					res.send("User registered with the following info: " + "<br>" + email + "<br>" + username + "<br>" + "<a href='/'>Back to log in screen</a>");
 				}
