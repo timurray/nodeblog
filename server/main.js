@@ -45,7 +45,7 @@ router.post('/login', function(req, res) {
 					console.log(uname);
 					
 					//redirects to user's blog page
-					res.redirect('/' + uname);
+					res.redirect('/blog/' + uname);
 					
 					return;
 				}
@@ -53,7 +53,7 @@ router.post('/login', function(req, res) {
 	});
 });
 
-router.get('/logout/:userName', function(req, res) {
+router.get('/logout/blog/:userName', function(req, res) {
 	var username = req.params.userName;
 	console.log(username);
 	db.serialize(function(err) {
@@ -64,7 +64,7 @@ router.get('/logout/:userName', function(req, res) {
 	res.redirect('/');
 });
 
-router.get('/:userName', function(req, res) {
+router.get('/blog/:userName', function(req, res) {
 	var username = req.params.userName;
 	var userExists = false;
 
