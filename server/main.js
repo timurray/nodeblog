@@ -3,7 +3,6 @@ var crypto = require('crypto');
 var bodyParser = require('body-parser');
 var sqlite = require('sqlite3').verbose();
 var router = express.Router();
-//var cookieParser = require('cookie-parser');
 
 var db = new sqlite.Database("blog.db");
 
