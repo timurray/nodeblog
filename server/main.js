@@ -52,7 +52,7 @@ router.post('/login', function(req, res) {
 	});
 });
 
-router.get('/logout/blog/:userName', function(req, res) {
+router.get('/logout/:userName', function(req, res) {
 	var username = req.params.userName;
 	console.log(username);
 	db.serialize(function(err) {
@@ -85,7 +85,8 @@ router.get('/blog/:userName', function(req, res) {
 					if(row.uid === username){
 						console.log(req.cookies.uuid);
 						res.send('<h1>you are logged in, here is your blog</h1>\n<a href="/logout/' + username + '">Logout</a>');
-						// LOAD EDIT BLOG HTML PAGE USING JADE/PUG????
+						// THIS NEXT PART NEEDS TO BE FIXED BEFORE USE
+						//res.render('blog', {userBlog: 'Welcome to your blog', user: username});
 					}
 					else if(!userExists){
 						res.send("this blog does not exist");

@@ -1,0 +1,26 @@
+doctype html
+html
+	head
+		title NodeBlog
+	body
+		h2= userBlog
+		
+		form(method='post', action='/:userName')
+			textarea(placeholder='Give your Post a Title', name='title' rows=1)
+			br
+			br
+			textarea(placeholder='Give your post some content, speak your mind', name='postbody', rows 100)
+			br
+			input(type='submit')
+		br
+		br
+		br
+		a(href='/logout/:' + #{user}) Logout ??NEED TO PASS USERNAME IN HERE SOMEHOW
+		br
+		br
+		h2 Previous Posts:
+		p Last Post
+		p Second Last Post
+		p Third Last Post
+		br
+		br

@@ -7,7 +7,8 @@ var server = express();
 server.use(express.static(__dirname + '/public'));
 server.use(bodyParser.urlencoded({ extended: true }));
 server.use(cookieParser());
-//server.use(session({ resave: true, saveUninitialzed: true, secret: "awdijnawido"}));
+server.set('views', 'views')
+server.set('view engine', 'pug');
 
 //all new routes go after this line
 //ex: var main = require('./main');
