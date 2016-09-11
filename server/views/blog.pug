@@ -5,7 +5,7 @@ html
 	body
 		h2= userBlog
 		
-		form(method='post', action='/:userName')
+		form(method='post', action='/blog/:userName')
 			textarea(placeholder='Give your Post a Title', name='title' rows=1)
 			br
 			br
@@ -15,12 +15,18 @@ html
 		br
 		br
 		br
-		a(href='/logout/:' + #{user}) Logout ??NEED TO PASS USERNAME IN HERE SOMEHOW
+		a(href='/logout/:' + user) Logout
 		br
 		br
-		h2 Previous Posts:
-		p Last Post
-		p Second Last Post
-		p Third Last Post
+		h1 Previous Posts:
+		h2= lastPostTitle
+		p= lastDate
+		p= lastPostBody
+		h2= secLastTitle
+		p= secDate
+		p= secLastBody
+		h2= thirdLastTitle
+		p= thirdDate
+		p= thirdLastBody
 		br
 		br

@@ -84,9 +84,27 @@ router.get('/blog/:userName', function(req, res) {
 					console.log(row);
 					if(row.uid === username){
 						console.log(req.cookies.uuid);
-						res.send('<h1>you are logged in, here is your blog</h1>\n<a href="/logout/' + username + '">Logout</a>');
-						// THIS NEXT PART NEEDS TO BE FIXED BEFORE USE
-						//res.render('blog', {userBlog: 'Welcome to your blog', user: username});
+						
+						var posts = [];
+						var i = 0;
+						
+						db.each("SELECT b.* FROM blogpost b, users u WHERE b.uid=u.user_id AND u.username='" + username + "' ORDER BY date DESC LIMIT 3", function(err, row) {
+							console.log(err);
+							console.log(row.title + '\n' + row.date + '\n' + row.body + '\n');
+        					posts[i] = new Object();
+       						posts[i].title = row.title;
+        					posts[i].date = row.date;
+        					posts[i].body = row.body;
+    						
+    						console.log(posts[i].title);
+    						i++;
+    						
+    						if(i === 3) {
+    							res.render('blog', {userBlog: 'Welcome to your blog', user: username, lastPostTitle: posts[0].title, lastDate: posts[0].date, lastPostBody: posts[0].body, secLastTitle: posts[1].title, secDate: posts[1].date, secLastBody: posts[1].body, thirdLastTitle: posts[2].title, thirdDate: posts[2].date, thirdLastBody: posts[2].body, pretty: true});
+    						}
+						});
+						
+						console.log(posts.length);
 					}
 					else if(!userExists){
 						res.send("this blog does not exist");
@@ -106,6 +124,12 @@ router.get('/blog/:userName', function(req, res) {
 		});
 	});
 });
+
+
+router.post('/post/:userName', function(req, res) {
+	
+});
+
 
 router.get('/register', function(req, res) {
 	res.sendFile('pages/register.html', {root: __dirname });
