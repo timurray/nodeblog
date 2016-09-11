@@ -100,7 +100,7 @@ router.get('/blog/:userName', function(req, res) {
     						i++;
     						
     						if(i === 3) {
-    							res.render('blog', {userBlog: 'Welcome to your blog', user: username, lastPostTitle: posts[0].title, lastDate: posts[0].date, lastPostBody: posts[0].body, secLastTitle: posts[1].title, secDate: posts[1].date, secLastBody: posts[1].body, thirdLastTitle: posts[2].title, thirdDate: posts[2].date, thirdLastBody: posts[2].body, pretty: true});
+    							res.render('blog', {userBlog: 'Welcome to your blog, ' + username, user: username, lastPostTitle: posts[0].title, lastDate: posts[0].date, lastPostBody: posts[0].body, secLastTitle: posts[1].title, secDate: posts[1].date, secLastBody: posts[1].body, thirdLastTitle: posts[2].title, thirdDate: posts[2].date, thirdLastBody: posts[2].body, pretty: true});
     						}
 						});
 						
@@ -110,7 +110,26 @@ router.get('/blog/:userName', function(req, res) {
 						res.send("this blog does not exist");
 					}
 					else {
-						res.send('you can view but not edit');
+						var posts = [];
+						var i = 0;
+						
+						db.each("SELECT b.* FROM blogpost b, users u WHERE b.uid=u.user_id AND u.username='" + username + "' ORDER BY date DESC LIMIT 3", function(err, row) {
+							console.log(err);
+							console.log(row.title + '\n' + row.date + '\n' + row.body + '\n');
+        					posts[i] = new Object();
+       						posts[i].title = row.title;
+        					posts[i].date = row.date;
+        					posts[i].body = row.body;
+    						
+    						console.log(posts[i].title);
+    						i++;
+    						
+    						if(i === 3) {
+    							res.render('blognoedit', {userBlog: 'Welcome to the blog of ' + username, user: username, lastPostTitle: posts[0].title, lastDate: posts[0].date, lastPostBody: posts[0].body, secLastTitle: posts[1].title, secDate: posts[1].date, secLastBody: posts[1].body, thirdLastTitle: posts[2].title, thirdDate: posts[2].date, thirdLastBody: posts[2].body, pretty: true});
+    						}
+						});
+						
+						console.log(posts.length);
 						// LOAD VIEW BLOG HTML PAGE
 					}
 				});
@@ -118,18 +137,43 @@ router.get('/blog/:userName', function(req, res) {
 			else if(!userExists){
 				res.send("this blog does not exist no session");
 			}
-			else{
-				res.send('you can view but not edit, no session token version');
+			else{		
+				var posts = [];
+				var i = 0;
+						
+				db.each("SELECT b.* FROM blogpost b, users u WHERE b.uid=u.user_id AND u.username='" + username + "' ORDER BY date DESC LIMIT 3", function(err, row) {
+					console.log(err);
+					console.log(row.title + '\n' + row.date + '\n' + row.body + '\n');
+    				posts[i] = new Object();
+       				posts[i].title = row.title;
+    				posts[i].date = row.date;
+					posts[i].body = row.body;
+    						
+    				console.log(posts[i].title);
+    				i++;
+    						
+    				if(i === 3) {
+    					res.render('blognoedit', {userBlog: 'Welcome to the blog of ' + username, user: username, lastPostTitle: posts[0].title, lastDate: posts[0].date, lastPostBody: posts[0].body, secLastTitle: posts[1].title, secDate: posts[1].date, secLastBody: posts[1].body, thirdLastTitle: posts[2].title, thirdDate: posts[2].date, thirdLastBody: posts[2].body, pretty: true});
+    				}
+				});
+						
+				console.log(posts.length);
 			}
 		});
 	});
 });
 
-
 router.post('/post/:userName', function(req, res) {
+	var title = req.body.title;
+	var body = req.body.postbody;
+	var username = req.params.userName;
+	
+	db.serialize(function() {
+		db.run("INSERT INTO blogpost(uid, title, date, body) VALUES ((SELECT user_id FROM users WHERE username='" + username + "'), '"+ title + "', datetime('now'), '" + body + "')");
+		res.redirect('back');
+	});
 	
 });
-
 
 router.get('/register', function(req, res) {
 	res.sendFile('pages/register.html', {root: __dirname });

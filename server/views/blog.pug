@@ -5,7 +5,7 @@ html
 	body
 		h2= userBlog
 		
-		form(method='post', action='/blog/:userName')
+		form(method='post', action='/post/' + user)
 			textarea(placeholder='Give your Post a Title', name='title' rows=1)
 			br
 			br
