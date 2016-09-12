@@ -19,14 +19,9 @@ html
 		br
 		br
 		h1 Previous Posts:
-		h2= lastPostTitle
-		p= lastDate
-		p= lastPostBody
-		h2= secLastTitle
-		p= secDate
-		p= secLastBody
-		h2= thirdLastTitle
-		p= thirdDate
-		p= thirdLastBody
+		each val in posts
+			h2= val.title
+			p= val.date
+			p= val.body
 		br
 		br

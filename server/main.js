@@ -89,22 +89,25 @@ router.get('/blog/:userName', function(req, res) {
 						var i = 0;
 						
 						db.each("SELECT b.* FROM blogpost b, users u WHERE b.uid=u.user_id AND u.username='" + username + "' ORDER BY date DESC LIMIT 3", function(err, row) {
-							console.log(err);
-							console.log(row.title + '\n' + row.date + '\n' + row.body + '\n');
-        					posts[i] = new Object();
-       						posts[i].title = row.title;
-        					posts[i].date = row.date;
-        					posts[i].body = row.body;
+							console.log(row);
+							if(row === undefined || row === [])
+							{
+							
+							}
+							else{
+								console.log(err);
+								console.log(row.title + '\n' + row.date + '\n' + row.body + '\n');
+        						posts[i] = new Object();
+       							posts[i].title = row.title;
+        						posts[i].date = row.date;
+        						posts[i].body = row.body;
     						
-    						console.log(posts[i].title);
-    						i++;
-    						
-    						if(i === 3) {
-    							res.render('blog', {userBlog: 'Welcome to your blog, ' + username, user: username, lastPostTitle: posts[0].title, lastDate: posts[0].date, lastPostBody: posts[0].body, secLastTitle: posts[1].title, secDate: posts[1].date, secLastBody: posts[1].body, thirdLastTitle: posts[2].title, thirdDate: posts[2].date, thirdLastBody: posts[2].body, pretty: true});
+    							console.log(posts[i].title);
+    							i++;
     						}
+						}, function() {
+							res.render('blog', {userBlog: 'Welcome to your blog, ' + username, user: username, posts: posts, pretty: true});
 						});
-						
-						console.log(posts.length);
 					}
 					else if(!userExists){
 						res.send("this blog does not exist");
@@ -114,23 +117,24 @@ router.get('/blog/:userName', function(req, res) {
 						var i = 0;
 						
 						db.each("SELECT b.* FROM blogpost b, users u WHERE b.uid=u.user_id AND u.username='" + username + "' ORDER BY date DESC LIMIT 3", function(err, row) {
-							console.log(err);
-							console.log(row.title + '\n' + row.date + '\n' + row.body + '\n');
-        					posts[i] = new Object();
-       						posts[i].title = row.title;
-        					posts[i].date = row.date;
-        					posts[i].body = row.body;
+							if(row === undefined || row === [])
+							{
+							
+							} 
+							else{
+								console.log(err);
+								console.log(row.title + '\n' + row.date + '\n' + row.body + '\n');
+        						posts[i] = new Object();
+       							posts[i].title = row.title;
+        						posts[i].date = row.date;
+        						posts[i].body = row.body;
     						
-    						console.log(posts[i].title);
-    						i++;
-    						
-    						if(i === 3) {
-    							res.render('blognoedit', {userBlog: 'Welcome to the blog of ' + username, user: username, lastPostTitle: posts[0].title, lastDate: posts[0].date, lastPostBody: posts[0].body, secLastTitle: posts[1].title, secDate: posts[1].date, secLastBody: posts[1].body, thirdLastTitle: posts[2].title, thirdDate: posts[2].date, thirdLastBody: posts[2].body, pretty: true});
-    						}
+    							console.log(posts[i].title);
+    							i++;
+    						}	
+						}, function() {
+							res.render('blognoedit', {userBlog: 'Welcome to the blog of ' + username, user: username, posts: posts, pretty: true});
 						});
-						
-						console.log(posts.length);
-						// LOAD VIEW BLOG HTML PAGE
 					}
 				});
 			}
@@ -142,22 +146,24 @@ router.get('/blog/:userName', function(req, res) {
 				var i = 0;
 						
 				db.each("SELECT b.* FROM blogpost b, users u WHERE b.uid=u.user_id AND u.username='" + username + "' ORDER BY date DESC LIMIT 3", function(err, row) {
-					console.log(err);
-					console.log(row.title + '\n' + row.date + '\n' + row.body + '\n');
-    				posts[i] = new Object();
-       				posts[i].title = row.title;
-    				posts[i].date = row.date;
-					posts[i].body = row.body;
+					if(row === undefined || row === [])
+					{
+					
+					}
+					else{
+						console.log(err);
+						console.log(row.title + '\n' + row.date + '\n' + row.body + '\n');
+    					posts[i] = new Object();
+       					posts[i].title = row.title;
+    					posts[i].date = row.date;
+						posts[i].body = row.body;
     						
-    				console.log(posts[i].title);
-    				i++;
-    						
-    				if(i === 3) {
-    					res.render('blognoedit', {userBlog: 'Welcome to the blog of ' + username, user: username, lastPostTitle: posts[0].title, lastDate: posts[0].date, lastPostBody: posts[0].body, secLastTitle: posts[1].title, secDate: posts[1].date, secLastBody: posts[1].body, thirdLastTitle: posts[2].title, thirdDate: posts[2].date, thirdLastBody: posts[2].body, pretty: true});
+    					console.log(posts[i].title);
+    					i++;
     				}
+				}, function() {
+					res.render('blognoedit', {userBlog: 'Welcome to the blog of ' + username, user: username, posts: posts, pretty: true});
 				});
-						
-				console.log(posts.length);
 			}
 		});
 	});
